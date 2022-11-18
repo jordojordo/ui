@@ -67,6 +67,7 @@ jobs:
         run: |
           chmod +x ./scripts/publish
           ./scripts/publish -s "${{ github.repository }}" -b main
+          ls -la ./charts/kubewarden
         shell: bash
 
       - name: Run chart-releaser
