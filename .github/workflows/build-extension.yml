@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths-ignore:
-      - ".github/workflows/**"
+      # - ".github/workflows/**"
       - "README.md"
     
 env:
@@ -17,7 +17,7 @@ defaults:
 
 jobs:
   release:
-    if: github.repository_owner == 'kubewarden'
+    # if: github.repository_owner == 'kubewarden'
     runs-on: ubuntu-latest
     permissions:
       id-token: write
