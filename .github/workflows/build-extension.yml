@@ -17,7 +17,7 @@ defaults:
 
 jobs:
   release:
-    if: github.repository_owner == 'kubewarden'
+    # if: github.repository_owner == 'kubewarden'
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -69,10 +69,6 @@ jobs:
           ./scripts/publish -s "${{ github.repository }}" -b main
         shell: bash
 
-      - name: Generate container image files
-        run: |
-          ./scripts/extract_images ./charts/kubewarden
-
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.4.1
         with:
@@ -83,6 +79,6 @@ jobs:
 
       - name: Commit build
         run: |
-          git add .
+          git add assets charts extensions index.yaml
           git commit -a -m "${{ env.CI_COMMIT_MESSAGE }}"
           git push
