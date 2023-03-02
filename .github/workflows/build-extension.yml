@@ -2,9 +2,11 @@ name: Build Kubewarden Extension
 
 on:
   push:
-    branches: [main]
-    paths:
-      - pkg/kubewarden/package.json
+    branches:
+      - main
+      - split-build-workflow-jobs
+    # paths:
+    #   - pkg/kubewarden/package.json
 
 env:
   ACTIONS_RUNNER_DEBUG: false
