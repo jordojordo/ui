@@ -8,6 +8,11 @@ on:
     branches:
       - main
 
+defaults:
+  run:
+    shell: bash
+    working-directory: ./
+
 jobs:
   unit-test:
     if: github.repository_owner == 'kubewarden'
