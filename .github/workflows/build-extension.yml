@@ -21,7 +21,7 @@ defaults:
 
 jobs:
   build:
-    if: github.repository_owner == 'kubewarden'
+    # if: github.repository_owner == 'kubewarden'
     name: Build extension artifact
     runs-on: ubuntu-latest
     permissions: write-all
@@ -76,40 +76,3 @@ jobs:
         with:
           name: charts
           path: tmp
-
-  release:
-    name: Release Build
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-    needs: build
-    runs-on: ubuntu-latest
-    permissions: write-all
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          ref: main
-
-      - name: Configure Git
-        run: |
-          git config user.name "$GITHUB_ACTOR"
-          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
-
-      - name: Download build artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: charts
-
-      - name: Commit build
-        run: |
-          git add ./{assets,charts,extensions,index.yaml}
-          git commit -a -m "${{ env.CI_COMMIT_MESSAGE }}"
-          git push
-
-      - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1.4.1
-        with:
-          charts_dir: ./charts/kubewarden
-        env:
-          CR_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
-          CR_SKIP_EXISTING: true

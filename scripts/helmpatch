@@ -7,8 +7,8 @@ const path = require('path');
 const yaml = require('js-yaml');
 
 // TODO: Should already be in the template
-const UI_PLUGIN_ANNOTATION_NAME = 'catalog.cattle.io/ui-component';
-const UI_PLUGIN_ANNOTATION_VALUE = 'plugins';
+// const UI_PLUGIN_ANNOTATION_NAME = 'catalog.cattle.io/ui-component';
+// const UI_PLUGIN_ANNOTATION_VALUE = 'plugins';
 
 console.log('Helm file update');
 
@@ -35,7 +35,27 @@ if (!fs.existsSync(chartFolder)) {
 // --------------------------------------------------------------------------------
 // Chart.yaml
 // --------------------------------------------------------------------------------
-// const chart = yaml.load(fs.readFileSync(chartFile, 'utf8'));
+const chart = yaml.load(fs.readFileSync(chartFile, 'utf8'));
+let updated = false;
+
+// Add in annotations to match any rules in the package file
+if (pkgFile.rancher && typeof pkgFile.rancher === 'object') {
+  // See if there are any annotations and merge them in, if there are
+  if (pkgFile.rancher.annotations) {
+    chart.annotations = chart.annotations || {};
+    Object.keys(pkgFile.rancher.annotations).forEach((key) => {
+      chart.annotations[key] = pkgFile.rancher.annotations[key];
+      updated = true;
+    });
+  }
+}
+
+if (updated ){
+  // Write out updated file
+  const str = yaml.dump(chart);
+
+  fs.writeFileSync(chartFile, str, 'utf8');
+}
 
 // chart.name = pkgFile.name;
 // chart.appVersion = pkgFile.version;
@@ -57,17 +77,13 @@ if (!fs.existsSync(chartFolder)) {
 //   chart.home = pkgFile.homepage;
 // }
 
-// const str = yaml.dump(chart);
-// fs.writeFileSync(chartFile, str, 'utf8');
-
 // --------------------------------------------------------------------------------
 // values.yaml
 // --------------------------------------------------------------------------------
 
 const values = yaml.load(fs.readFileSync(valuesFile, 'utf8'));
 
-values.pluginServer.image.repository = `${ image }`;
+values.pluginServer.image.repository = `${image}`;
 
-const valuesYaml = yaml.dump(values, { quotingType: '"' });
-
+const valuesYaml = yaml.dump(values, {quotingType: '"' });
 fs.writeFileSync(valuesFile, valuesYaml, 'utf8');
