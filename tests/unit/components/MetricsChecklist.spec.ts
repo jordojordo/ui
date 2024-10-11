@@ -3,18 +3,20 @@ import { createWrapper } from '@tests/unit/_utils_/wrapper';
 import MetricsChecklist from '@kubewarden/components/MetricsChecklist.vue';
 
 const commons = {
-  propsData: {},
-  computed:  { hasKubewardenDashboards: () => false },
-  mocks:     {
-    $store: {
-      getters: {
-        currentCluster: () => ({ id: 'test-cluster' }),
-        'i18n/t':       () => jest.fn(),
+  props: {},
+  global: {
+    computed:  { hasKubewardenDashboards: () => false },
+    mocks:     {
+      $store: {
+        getters: {
+          currentCluster: () => ({ id: 'test-cluster' }),
+          'i18n/t':       () => jest.fn(),
+        },
       },
+      $router: jest.fn(),
+      $route:  jest.fn(),
     },
-    $router: jest.fn(),
-    $route:  jest.fn(),
-  },
+  }
 };
 
 const wrapperFactory = createWrapper(MetricsChecklist, commons);
@@ -24,7 +26,7 @@ describe('MetricChecklist.vue', () => {
     const conflictingGrafanaDashboards = [{ metadata: { name: 'Dashboard1' } }];
 
     const wrapper = wrapperFactory({
-      propsData: { conflictingGrafanaDashboards },
+      props: { conflictingGrafanaDashboards },
       computed:  { hasKubewardenDashboards: () => false },
       stubs:     {
         'router-link': { template: '<span />' },
@@ -37,7 +39,7 @@ describe('MetricChecklist.vue', () => {
 
   it('does not show the conflicting dashboards banner when there are no conflicting dashboards', () => {
     const wrapper = wrapperFactory({
-      propsData: { conflictingGrafanaDashboards: [] },
+      props: { conflictingGrafanaDashboards: [] },
       computed:  { hasKubewardenDashboards: () => false },
       stubs:     {
         'router-link': { template: '<span />' },
@@ -52,7 +54,7 @@ describe('MetricChecklist.vue', () => {
     const conflictingGrafanaDashboards = [{ metadata: { name: 'Dashboard1' } }];
 
     const wrapper = wrapperFactory({
-      propsData: { conflictingGrafanaDashboards },
+      props: { conflictingGrafanaDashboards },
       computed:  { hasKubewardenDashboards: () => true }, // Simulate presence of KubeWarden dashboards
       stubs:     {
         'router-link': { template: '<span />' },
@@ -65,7 +67,7 @@ describe('MetricChecklist.vue', () => {
 
   it('disables the dashboard button when there is no monitoring app', () => {
     const wrapper = wrapperFactory({
-      propsData: {
+      props: {
         monitoringApp:                null,
         cattleDashboardNs:            {},
         conflictingGrafanaDashboards: [],
@@ -81,7 +83,7 @@ describe('MetricChecklist.vue', () => {
 
   it('disables the dashboard button when the cattleDashboardNs is empty', () => {
     const wrapper = wrapperFactory({
-      propsData: {
+      props: {
         monitoringApp:                {},
         cattleDashboardNs:            null,
         conflictingGrafanaDashboards: [],
@@ -97,7 +99,7 @@ describe('MetricChecklist.vue', () => {
 
   it('disables the dashboard button when there are conflicting Grafana dashboards', () => {
     const wrapper = wrapperFactory({
-      propsData: {
+      props: {
         monitoringApp:                {},
         cattleDashboardNs:            {},
         conflictingGrafanaDashboards: [{ metadata: { name: 'Dashboard1' } }],
@@ -113,7 +115,7 @@ describe('MetricChecklist.vue', () => {
 
   it('enables the dashboard button when monitoring app is present, cattleDashboardNs is not empty, and there are no conflicting Grafana dashboards', () => {
     const wrapper = wrapperFactory({
-      propsData: {
+      props: {
         monitoringApp:                {},
         cattleDashboardNs:            { someKey: 'someValue' },
         conflictingGrafanaDashboards: [],
@@ -131,7 +133,7 @@ describe('MetricChecklist.vue', () => {
     const conflictingGrafanaDashboards = [{ metadata: { name: 'Dashboard1' } }];
 
     const wrapper = wrapperFactory({
-      propsData: {
+      props: {
         monitoringApp:     {},
         cattleDashboardNs: { someKey: 'someValue' },
         conflictingGrafanaDashboards,

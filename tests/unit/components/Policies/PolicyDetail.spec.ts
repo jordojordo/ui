@@ -6,25 +6,35 @@ import PolicyDetail from '@kubewarden/components/Policies/PolicyDetail.vue';
 const commonMocks = { $fetchState: { pending: false } };
 const commonComputed = { monitoringStatus: () => jest.fn() };
 
-const defaultPropsData = { resource: '', value: {} };
-const createPolicyDetailWrapper = createWrapper(PolicyDetail, commonMocks, commonComputed, defaultPropsData);
+const defaultProps = { resource: '', value: {} };
+
+const wrapperFactory = createWrapper<typeof defaultProps>(
+  PolicyDetail,
+  {
+    props: defaultProps,
+    global: {
+      mocks: commonMocks,
+      computed: commonComputed,
+    },
+  }
+);
 
 describe('PolicyDetail.vue', () => {
   it('computes dashboardVars correctly', () => {
-    const wrapper = createPolicyDetailWrapper({ propsData: { value: { id: 'test-id' } } });
+    const wrapper = wrapperFactory({ props: { value: { id: 'test-id' } } });
 
     expect(wrapper.vm.dashboardVars).toEqual({ policy_name: 'clusterwide-test-id' });
   });
 
   it('initializes policyReadme as null', () => {
-    const wrapper = createPolicyDetailWrapper();
+    const wrapper = wrapperFactory();
 
     expect(wrapper.vm.policyReadme).toBeNull();
   });
 
   it('fetches artifactHub package if available', async() => {
-    const wrapper = createPolicyDetailWrapper({
-      propsData: {
+    const wrapper = wrapperFactory({
+      props: {
         value: {
           metadata:                  { annotations: { [ARTIFACTHUB_PKG_ANNOTATION]: true } },
           artifactHubPackageVersion: jest.fn().mockResolvedValue({ readme: 'test-readme' })
@@ -40,8 +50,8 @@ describe('PolicyDetail.vue', () => {
   it('handles errors in fetch gracefully', async() => {
     console.warn = jest.fn(); // eslint-disable-line no-console
 
-    const wrapper = createPolicyDetailWrapper({
-      propsData: {
+    const wrapper = wrapperFactory({
+      props: {
         value: {
           metadata:                  { annotations: { [ARTIFACTHUB_PKG_ANNOTATION]: true } },
           artifactHubPackageVersion: jest.fn().mockRejectedValue(new Error('fetch error'))
